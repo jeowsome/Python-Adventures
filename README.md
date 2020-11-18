@@ -13,3 +13,6 @@ Loan Calculator/Loan Calculator/task/creditcalc/creditcalc.py
 
 Simple Chatty Bot
 Simple Chatty Bot/Simple Chatty Bot/task/bot/bot.py
+
+Coffee Machine
+https://github.com/jeowsome/Python-Adventures/blob/main/Coffee%20Machine/Coffee%20Machine/task/machine/coffee_machine.py
