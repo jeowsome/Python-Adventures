@@ -1,0 +1,94 @@
+import random
+import sqlite3
+
+
+class Bank:
+    id = 0
+
+    def __init__(self):
+        Bank.id += 1
+        self.card_no = None
+        self.pin = None
+        self.option = None
+        self.system = True
+        self.log_in_status = False
+        self.conn = sqlite3.connect('cards.s3db')
+        self.curr = self.conn.cursor()
+
+    def create_db(self):
+        self.curr.execute('''CREATE table card (
+        id INTEGER,
+        number TEXT,
+        pin TEXT,
+        balance INTEGER DEFAULT 0);''')
+        self.conn.commit()
+
+    def operation(self):
+        while self.system:
+            print("1. Create an account\n2. Log into account\n0. Exit\n")
+            self.option = int(input(">"))
+            if self.option==1:
+                Bank.create_acc(self)
+            if self.option==2:
+                Bank.log_in(self)
+            if self.option==0:
+                Bank.close(self)
+
+    def create_acc(self):
+        num = str(400000) + str(random.randint(100_000_000,999_999_999))
+        num_list = [int(i) for i in num]
+        for i in range(0,len(num_list),2):
+            num_list[i] = num_list[i] * 2
+
+        for i in range(len(num_list)):
+            if num_list[i] > 9:
+                num_list[i] -= 9
+
+        for i in range(10):
+            total = sum(num_list) + i
+            if total % 10==0:
+                checksum = i
+                break
+            else:
+                total = sum(num_list)
+
+        self.card_no = num + str(checksum)
+        self.pin = str(random.randint(1000,9999))
+        print("Your card has been created")
+        print("Your card number:")
+        print(self.card_no)
+        print("Your card PIN:")
+        print(self.pin)
+        self.curr.execute("INSERT INTO card VALUES (:id, :number, :pin, :balance)",
+                          {'id': Bank.id, 'number': self.card_no, 'pin': self.pin, 'balance': 0})
+
+    def log_in(self):
+        card_no1 = input("Enter your card number:\n>")
+        pin1 = input("Enter your PIN:\n>")
+        if self.card_no==card_no1 and self.pin==pin1:
+            print("You have successfully logged in!")
+            self.log_in_status = True
+            while self.log_in_status:
+                self.log_in_operation()
+        else:
+            print("Wrong card number or PIN!")
+
+    def log_in_operation(self):
+        print("1. Balance\n2. Log out\n0. Exit")
+        login_option = int(input(">"))
+        if login_option==1:
+            print("Balance: " + str(0))
+        elif login_option==2:
+            print("You have successfully logged out!")
+            self.log_in_status = False
+            self.operation()
+        else:
+            exit()
+
+    def close(self):
+        self.system = False
+
+
+account = Bank()
+account.operation()
+print("Bye!")
